@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetroRide — Avtomobil Bazarı</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #f1f3f5; color: #1a1a1a; min-height: 100vh; }
+
+header {
+  background: #1c2b4a;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+.header-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: flex; align-items: center;
+  padding: 0 16px; height: 52px; gap: 12px;
+}
+.logo { font-weight: 800; font-size: 1.2rem; color: #fff; text-decoration: none; white-space: nowrap; }
+.logo span { color: #d91c1c; }
+.header-search {
+  flex: 1; max-width: 380px;
+  display: flex; align-items: center;
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 3px; overflow: hidden;
+}
+.header-search input { flex: 1; border: none; background: transparent; padding: 6px 10px; font-family: inherit; font-size: 0.85rem; outline: none; color: #fff; }
+.header-search input::placeholder { color: rgba(255,255,255,0.45); }
+.header-search button { background: #d91c1c; border: none; color: #fff; padding: 6px 12px; cursor: pointer; font-size: 0.85rem; }
+.header-search button:hover { background: #b31515; }
+.header-actions { display: flex; align-items: center; gap: 7px; margin-left: auto; }
+
+.btn { display: inline-flex; align-items: center; gap: 4px; font-family: inherit; font-weight: 600; font-size: 0.8rem; padding: 6px 13px; border-radius: 3px; cursor: pointer; transition: all .15s; border: none; white-space: nowrap; }
+.btn-primary  { background: #d91c1c; color: #fff; }
+.btn-primary:hover  { background: #b31515; }
+.btn-outline  { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.35); }
+.btn-outline:hover  { background: rgba(255,255,255,0.08); }
+.btn-navy   { background: #1c2b4a; color: #fff; }
+.btn-navy:hover   { background: #162238; }
+.btn-ghost  { background: #fff; color: #333; border: 1px solid #d5d5d5; }
+.btn-ghost:hover  { background: #f0f0f0; }
+.btn-red    { background: #c0392b; color: #fff; }
+.btn-red:hover    { background: #a93226; }
+.btn-sm { padding: 4px 9px; font-size: 0.76rem; }
+#authBtns, #userMenu { display: flex; align-items: center; gap: 6px; }
+.user-avatar { width: 30px; height: 30px; border-radius: 50%; background: #d91c1c; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; cursor: pointer; }
+
+.hero { background: #1c2b4a; padding: 20px 16px 24px; text-align: center; border-bottom: 3px solid #d91c1c; }
+.hero h1 { font-weight: 800; font-size: clamp(1.2rem, 3.5vw, 1.8rem); color: #fff; margin-bottom: 4px; }
+.hero h1 span { color: #d91c1c; }
+.hero p { color: rgba(255,255,255,0.5); font-size: 0.82rem; margin-bottom: 14px; }
+.filter-bar { background: #fff; border-radius: 3px; padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 7px; max-width: 800px; margin: 0 auto; box-shadow: 0 4px 18px rgba(0,0,0,0.22); }
+.filter-bar input, .filter-bar select { flex: 1; min-width: 100px; padding: 6px 9px; border: 1px solid #d5d5d5; border-radius: 2px; font-family: inherit; font-size: 0.8rem; color: #333; background: #fafafa; outline: none; }
+.filter-bar input:focus, .filter-bar select:focus { border-color: #1c2b4a; }
+.filter-bar .btn { flex: 0 0 auto; }
+.btn-soft-reset { background: #f0f0f0; color: #555; border: 1px solid #d5d5d5; }
+.btn-soft-reset:hover { background: #e5e5e5; }
+
+.stats-bar { background: #fff; border-bottom: 1px solid #e0e0e0; padding: 6px 16px; }
+.stats-inner { max-width: 1280px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.stats-count { font-size: 0.8rem; color: #666; }
+.stats-count strong { color: #1a1a1a; }
+.sort-select { padding: 4px 7px; border: 1px solid #d5d5d5; border-radius: 2px; font-family: inherit; font-size: 0.78rem; background: #fff; cursor: pointer; color: #333; }
+
+.main { max-width: 1280px; margin: 0 auto; padding: 12px 16px 64px; }
+
+.car-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+
+.car-card { background: #fff; border: 1px solid #dde1e7; border-radius: 2px; overflow: hidden; cursor: pointer; transition: box-shadow .15s, border-color .15s; display: flex; flex-direction: column; }
+.car-card:hover { border-color: #1c2b4a; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+
+.car-img { position: relative; height: 135px; background: #edf0f3; overflow: hidden; flex-shrink: 0; }
+.car-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .22s; }
+.car-card:hover .car-img img { transform: scale(1.03); }
+.no-img { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #b0b8c4; gap: 5px; font-size: 0.7rem; }
+.no-img svg { width: 32px; height: 32px; }
+.car-badge { position: absolute; top: 5px; left: 5px; background: #2e7d32; color: #fff; font-size: 0.62rem; font-weight: 700; padding: 2px 5px; border-radius: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+.car-badge.sold { background: #757575; }
+.img-count-badge { position: absolute; bottom: 5px; right: 5px; background: rgba(0,0,0,0.52); color: #fff; font-size: 0.63rem; font-weight: 600; padding: 1px 5px; border-radius: 2px; }
+
+.car-info { padding: 8px 9px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.car-title { font-weight: 700; font-size: 0.84rem; color: #1a1a1a; line-height: 1.25; }
+.car-specs { display: flex; flex-wrap: wrap; gap: 3px; }
+.spec-tag { background: #f1f3f5; color: #555; font-size: 0.68rem; padding: 1px 5px; border-radius: 2px; border: 1px solid #e0e3e8; }
+.car-price { font-weight: 800; font-size: 0.95rem; color: #c0392b; margin-top: 2px; }
+.car-footer { padding: 5px 9px; border-top: 1px solid #eeeff1; display: flex; align-items: center; justify-content: space-between; }
+.car-owner { font-size: 0.67rem; color: #888; }
+.car-date  { font-size: 0.65rem; color: #bbb; }
+
+.empty-state { text-align: center; padding: 50px 20px; color: #999; grid-column: 1/-1; }
+.empty-state svg { width: 52px; height: 52px; color: #ddd; margin-bottom: 10px; }
+.empty-state h3 { font-size: 0.95rem; margin-bottom: 5px; color: #555; }
+.spinner { display: flex; justify-content: center; padding: 48px; grid-column: 1/-1; }
+.spin { width: 30px; height: 30px; border: 3px solid #e0e0e0; border-top-color: #1c2b4a; border-radius: 50%; animation: spin .65s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.modal-overlay { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.52); backdrop-filter: blur(2px); align-items: center; justify-content: center; padding: 12px; }
+.modal-overlay.open { display: flex; }
+.modal { background: #fff; border-radius: 3px; width: 100%; max-width: 470px; max-height: 92vh; overflow-y: auto; box-shadow: 0 8px 30px rgba(0,0,0,0.22); animation: fadeUp .17s ease; }
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } }
+.modal-header { padding: 14px 16px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eeeff1; }
+.modal-title { font-weight: 700; font-size: 1rem; }
+.modal-close { background: none; border: none; font-size: 1.35rem; cursor: pointer; color: #aaa; line-height: 1; }
+.modal-body { padding: 14px 16px; }
+.form-group { margin-bottom: 11px; }
+.form-group label { display: block; font-size: 0.77rem; font-weight: 600; margin-bottom: 3px; color: #444; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 7px 9px; border: 1px solid #d5d5d5; border-radius: 2px; font-family: inherit; font-size: 0.85rem; color: #1a1a1a; background: #fafafa; outline: none; transition: border-color .15s; resize: vertical; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #1c2b4a; background: #fff; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.form-error { color: #c0392b; font-size: 0.78rem; margin-top: 5px; display: none; }
+.form-error.show { display: block; }
+.modal-footer { padding: 0 16px 14px; display: flex; gap: 7px; justify-content: flex-end; }
+
+.detail-modal { max-width: 640px; }
+.detail-gallery { position: relative; height: 270px; background: #111; border-radius: 2px; overflow: hidden; margin-bottom: 13px; }
+.detail-gallery img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.detail-gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display: flex; justify-content: space-between; padding: 0 9px; pointer-events: none; }
+.gallery-btn { background: rgba(255,255,255,0.85); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; pointer-events: all; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.gallery-btn:hover { background: #fff; }
+.gallery-dots { position: absolute; bottom: 7px; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; }
+.gallery-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.38); cursor: pointer; }
+.gallery-dot.active { background: #fff; }
+.gallery-counter { position: absolute; top: 7px; right: 7px; background: rgba(0,0,0,0.48); color: #fff; font-size: 0.7rem; font-weight: 600; padding: 2px 7px; border-radius: 2px; }
+.delete-img-btn { position: absolute; top: 7px; left: 7px; background: rgba(192,57,43,0.88); color: #fff; border: none; padding: 3px 9px; border-radius: 2px; font-size: 0.75rem; cursor: pointer; z-index: 10; font-family: inherit; font-weight: 600; display: none; }
+.delete-img-btn:hover { background: rgba(169,50,38,0.95); }
+.detail-price { font-weight: 800; font-size: 1.5rem; color: #c0392b; margin-bottom: 11px; }
+.detail-specs { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 12px; }
+.detail-spec { background: #f5f7f9; border-radius: 2px; padding: 7px 11px; border: 1px solid #e5e8ec; }
+.detail-spec .lbl { font-size: 0.67rem; color: #888; margin-bottom: 2px; text-transform: uppercase; letter-spacing: 0.3px; }
+.detail-spec .val { font-weight: 700; font-size: 0.87rem; }
+.detail-desc { font-size: 0.85rem; color: #555; line-height: 1.6; margin-bottom: 13px; }
+.detail-owner { background: #f5f7f9; border-radius: 2px; padding: 11px 13px; display: flex; align-items: center; gap: 11px; border: 1px solid #e5e8ec; }
+.owner-avatar { width: 38px; height: 38px; border-radius: 50%; background: #1c2b4a; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; flex-shrink: 0; }
+.owner-name  { font-weight: 700; font-size: 0.87rem; }
+.owner-phone { color: #1c2b4a; font-weight: 600; font-size: 0.82rem; margin-top: 2px; }
+
+.my-card-actions { display: flex; gap: 5px; padding: 6px 9px; border-top: 1px solid #eeeff1; background: #fafafa; }
+
+.img-upload-area { border: 2px dashed #ccc; border-radius: 2px; padding: 13px; text-align: center; cursor: pointer; transition: border-color .15s; color: #888; font-size: 0.8rem; user-select: none; }
+.img-upload-area:hover { border-color: #1c2b4a; color: #1c2b4a; }
+.img-upload-area input { display: none; }
+.img-previews { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.img-preview-wrap { position: relative; }
+.img-preview { width: 60px; height: 60px; border-radius: 2px; object-fit: cover; border: 1px solid #ddd; display: block; }
+.img-del { position: absolute; top: -4px; right: -4px; width: 16px; height: 16px; border-radius: 50%; background: #c0392b; color: #fff; border: none; cursor: pointer; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; line-height: 1; font-family: inherit; }
+
+.toast-container { position: fixed; bottom: 14px; right: 14px; z-index: 999; display: flex; flex-direction: column; gap: 5px; }
+.toast { background: #1c2b4a; color: #fff; padding: 9px 14px; border-radius: 3px; font-size: 0.8rem; font-weight: 500; box-shadow: 0 3px 14px rgba(0,0,0,0.2); animation: slideIn .22s ease; display: flex; align-items: center; gap: 7px; max-width: 280px; }
+.toast.success { border-left: 3px solid #2e7d32; }
+.toast.error   { border-left: 3px solid #c0392b; }
+@keyframes slideIn { from { opacity:0; transform:translateX(44px); } }
+
+.page { display: none; }
+.page.active { display: block; }
+
+.profile-tabs { display: flex; border-bottom: 2px solid #e0e3e8; margin-bottom: 16px; }
+.profile-tab-btn { background: none; border: none; font-family: inherit; font-size: 0.85rem; font-weight: 600; color: #888; padding: 9px 16px; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .14s; }
+.profile-tab-btn.active { color: #1c2b4a; border-bottom-color: #1c2b4a; }
+.profile-card { background: #fff; border-radius: 3px; border: 1px solid #dde1e7; padding: 18px; max-width: 420px; }
+.profile-avatar-lg { width: 56px; height: 56px; border-radius: 50%; background: #1c2b4a; color: #fff; font-size: 1.4rem; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-bottom: 13px; }
+
+.mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; z-index: 150; background: #fff; border-top: 1px solid #e0e0e0; padding: 5px 0 env(safe-area-inset-bottom, 5px); }
+.mobile-nav-inner { display: flex; justify-content: space-around; }
+.mob-nav-btn { background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 0.58rem; font-weight: 600; color: #999; padding: 5px 12px; cursor: pointer; font-family: inherit; transition: color .14s; }
+.mob-nav-btn svg { width: 19px; height: 19px; }
+.mob-nav-btn.active { color: #1c2b4a; }
+
+@media (max-width: 640px) {
+  .header-search { display: none; }
+  .mobile-nav { display: block; }
+  .main { padding-bottom: 70px; }
+  .form-row { grid-template-columns: 1fr; }
+  .car-grid { grid-template-columns: repeat(2, 1fr); gap: 7px; }
+  .car-img { height: 115px; }
+  .detail-gallery { height: 210px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#" onclick="showPage('home')">Retro<span>Ride</span></a>
+    <div class="header-search">
+      <input type="text" id="headerSearch" placeholder="Marka, model axtar...">
+      <button onclick="doSearch()">🔍</button>
+    </div>
+    <div class="header-actions">
+      <div id="authBtns">
+        <button class="btn btn-outline" onclick="openModal('loginModal')">Daxil ol</button>
+        <button class="btn btn-primary" onclick="openModal('registerModal')">Qeydiyyat</button>
+      </div>
+      <div id="userMenu" style="display:none;">
+        <button class="btn btn-primary" onclick="openModal('addCarModal')">+ Elan ver</button>
+        <div class="user-avatar" id="userAvatarBtn" onclick="showPage('profile')" title="Profilim"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div id="homePage" class="page active">
+  <div class="hero">
+    <h1>Klassik <span>Avtomobil</span> Bazarı</h1>
+    <p>Minlərlə elan bir yerdə</p>
+    <div class="filter-bar">
+      <input type="text"   id="filterBrand"    placeholder="Marka və ya model">
+      <input type="number" id="filterYearMin"  placeholder="İldən">
+      <input type="number" id="filterYearMax"  placeholder="İlə">
+      <input type="number" id="filterPriceMax" placeholder="Maks. qiymət ($)">
+      <button class="btn btn-navy"       onclick="applyFilter()">Axtar</button>
+      <button class="btn btn-soft-reset" onclick="clearFilter()">Sıfırla</button>
+    </div>
+  </div>
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <span class="stats-count">Tapıldı: <strong id="carCount">0</strong> elan</span>
+      <select class="sort-select" id="sortSelect" onchange="sortCars()">
+        <option value="newest">Ən yeni</option>
+        <option value="cheapest">Ucuz əvvəl</option>
+        <option value="expensive">Bahalı əvvəl</option>
+      </select>
+    </div>
+  </div>
+  <div class="main">
+    <div id="carGrid" class="car-grid"></div>
+  </div>
+</div>
+
+<div id="myAdsPage" class="page">
+  <div class="main">
+    <h2 style="font-weight:800;margin-bottom:12px;font-size:1rem;">Mənim Elanlarım</h2>
+    <div id="myCarGrid" class="car-grid"></div>
+  </div>
+</div>
+
+<div id="profilePage" class="page">
+  <div class="main">
+    <div class="profile-tabs">
+      <button class="profile-tab-btn active" id="tabInfoBtn" onclick="switchProfileTab('info')">Məlumatlarım</button>
+      <button class="profile-tab-btn"        id="tabAdsBtn"  onclick="switchProfileTab('ads')">Elanlarım</button>
+    </div>
+    <div id="tabInfo">
+      <div class="profile-card">
+        <div class="profile-avatar-lg" id="profileAvatar">?</div>
+        <div class="form-group"><label>Ad Soyad</label><input type="text" id="profileName" placeholder="Adınız"></div>
+        <div class="form-group"><label>E-mail</label><input type="text" id="profileEmail" disabled style="opacity:.6"></div>
+        <div class="form-group"><label>Telefon</label><input type="text" id="profilePhone" placeholder="+994 50 000 00 00"></div>
+        <button class="btn btn-primary" onclick="updateProfile()">Yadda saxla</button>
+        <button class="btn btn-ghost" style="margin-left:7px;" onclick="logout()">Çıxış</button>
+      </div>
+    </div>
+    <div id="tabAds" style="display:none;">
+      <div id="profileCarGrid" class="car-grid"></div>
+    </div>
+  </div>
+</div>
+
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <button class="mob-nav-btn active" id="mobHome" onclick="showPage('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Ana Səhifə
+    </button>
+    <button class="mob-nav-btn" id="mobMyAds" onclick="requireAuth('myads')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Elanlarım
+    </button>
+    <button class="mob-nav-btn" onclick="requireAuth('add')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Elan ver
+    </button>
+    <button class="mob-nav-btn" id="mobProfile" onclick="requireAuth('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil
+    </button>
+  </div>
+</nav>
+
+<!-- LOGIN -->
+<div class="modal-overlay" id="loginModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Daxil ol</span><button class="modal-close" onclick="closeModal('loginModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>E-mail</label><input type="email" id="loginEmail" placeholder="email@example.com"></div>
+      <div class="form-group"><label>Şifrə</label><input type="password" id="loginPassword" placeholder="••••••••"></div>
+      <div class="form-error" id="loginError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('loginModal');openModal('registerModal')">Qeydiyyat</button>
+      <button class="btn btn-primary" onclick="doLogin()">Daxil ol</button>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div class="modal-overlay" id="registerModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Qeydiyyat</span><button class="modal-close" onclick="closeModal('registerModal')">×</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label>Ad Soyad</label><input type="text" id="regName" placeholder="Adınız Soyadınız"></div>
+      <div class="form-group"><label>E-mail</label><input type="email" id="regEmail" placeholder="email@example.com"></div>
+      <div class="form-group"><label>Telefon</label><input type="text" id="regPhone" placeholder="+994 50 000 00 00"></div>
+      <div class="form-group"><label>Şifrə</label><input type="password" id="regPassword" placeholder="••••••••"></div>
+      <div class="form-error" id="regError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('registerModal');openModal('loginModal')">Daxil ol</button>
+      <button class="btn btn-primary" onclick="doRegister()">Qeydiyyatdan keç</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD CAR -->
+<div class="modal-overlay" id="addCarModal">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title" id="addCarTitle">Yeni Elan</span><button class="modal-close" onclick="closeModal('addCarModal')">×</button></div>
+    <div class="modal-body">
+      <input type="hidden" id="editCarId">
+      <div class="form-row">
+        <div class="form-group"><label>Marka *</label><input type="text" id="carBrand" placeholder="BMW, Toyota..."></div>
+        <div class="form-group"><label>Model *</label><input type="text" id="carModel" placeholder="3 Series, Camry..."></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>İl *</label><input type="number" id="carYear" placeholder="2005"></div>
+        <div class="form-group"><label>Qiymət ($) *</label><input type="number" id="carPrice" placeholder="15000"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label>Yürüş (km)</label><input type="number" id="carMileage" placeholder="120000"></div>
+        <div class="form-group"><label>Rəng</label><input type="text" id="carColor" placeholder="Qara, Ağ..."></div>
+      </div>
+      <div class="form-group">
+        <label>Şəkillər (maks. 5)</label>
+        <div class="img-upload-area" id="uploadArea" onclick="document.getElementById('imgFileInput').click()">
+          <input type="file" id="imgFileInput" accept="image/*" multiple onchange="handleFileSelect(this)">
+          <span id="uploadLabel">Şəkil seçin (maks. 5 ədəd)</span>
+        </div>
+        <div class="img-previews" id="imgPreviews"></div>
+      </div>
+      <div class="form-group"><label>Təsvir</label><textarea id="carDesc" rows="3" placeholder="Maşın haqqında məlumat..."></textarea></div>
+      <div class="form-error" id="addCarError"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost"   onclick="closeModal('addCarModal')">Ləğv et</button>
+      <button class="btn btn-primary" onclick="saveCar()">Yayımla</button>
+    </div>
+  </div>
+</div>
+
+<!-- DETAIL -->
+<div class="modal-overlay" id="carDetailModal">
+  <div class="modal detail-modal">
+    <div class="modal-header"><span class="modal-title" id="detailTitle"></span><button class="modal-close" onclick="closeModal('carDetailModal')">×</button></div>
+    <div class="modal-body">
+      <div class="detail-gallery" id="detailGallery">
+        <img id="detailMainImg" src="" alt="" style="display:none">
+        <button class="delete-img-btn" id="deleteImgBtn" onclick="deleteCurrentImage()">🗑 Şəkili sil</button>
+        <div class="detail-gallery-nav" id="detailNav" style="display:none">
+          <button class="gallery-btn" onclick="galleryNav(-1)">‹</button>
+          <button class="gallery-btn" onclick="galleryNav(1)">›</button>
+        </div>
+        <div class="gallery-dots"    id="galleryDots"></div>
+        <div class="gallery-counter" id="galleryCounter" style="display:none"></div>
+      </div>
+      <div class="detail-price" id="detailPrice"></div>
+      <div class="detail-specs" id="detailSpecs"></div>
+      <div class="detail-desc"  id="detailDesc"></div>
+      <div class="detail-owner" id="detailOwner"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+// Server IP-sini və Portunu bura daxil edirik:
+const API = 'http://13.48.194.173:8080'; // Sənin AWS Server IP-n
+
+function toAbsUrl(u) {
+  if (!u) return null;
+  if (u.startsWith('http')) return u;
+  
+  // Əgər gələn ünvan backend-in şəkil yoludursa, onu birbaşa Amazon S3 linkinə çeviririk:
+  if (u.includes('/api/images/')) {
+    const fileName = u.substring(u.lastIndexOf('/') + 1);
+    return 'https://retroride-sekiller-nihat.s3.eu-north-1.amazonaws.com/' + fileName;
+  }
+  
+  return API + (u.startsWith('/') ? u : '/' + u);
+}
+
+let token = localStorage.getItem('rr_token') || null;
+let allCars = [], filteredCars = [];
+let galleryImgs = [], galleryIdx = 0; // galleryImgs = [{id, url}, ...]
+let currentCarOwnerId = null;
+let currentUserId = null;
+const MAX_IMG = 5;
+let selFiles = [];
+
+function hdrs(json = true) {
+  const h = {};
+  if (json) h['Content-Type'] = 'application/json';
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  return h;
+}
+
+// ── AUTH ──
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPassword').value;
+  if (!email || !pass) return showErr('loginError','Bütün sahələri doldurun');
+  try {
+    const r = await fetch(`${API}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const d = await r.json();
+    if (!r.ok) return showErr('loginError', d.message||'Xəta');
+    token = d.token; localStorage.setItem('rr_token',token);
+    closeModal('loginModal'); updateAuthUI(); loadProfile();
+    toast('Xoş gəldiniz!','success');
+  } catch { showErr('loginError','Server ilə əlaqə yoxdur'); }
+}
+
+async function doRegister() {
+  const name=document.getElementById('regName').value.trim(), email=document.getElementById('regEmail').value.trim();
+  const phone=document.getElementById('regPhone').value.trim(), pass=document.getElementById('regPassword').value;
+  if (!name||!email||!pass) return showErr('regError','Ad, email və şifrə mütləqdir');
+  try {
+    const r = await fetch(`${API}/api/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,phone,password:pass})});
+    const d = await r.json();
+    if (!r.ok) return showErr('regError',d.message||'Xəta');
+    token=d.token; localStorage.setItem('rr_token',token);
+    closeModal('registerModal'); updateAuthUI(); loadProfile();
+    toast('Qeydiyyat uğurlu oldu!','success');
+  } catch { showErr('regError','Server ilə əlaqə yoxdur'); }
+}
+
+function logout() { token=null; currentUserId=null; localStorage.removeItem('rr_token'); updateAuthUI(); showPage('home'); toast('Çıxış edildi'); }
+function updateAuthUI() { const a=!!token; document.getElementById('authBtns').style.display=a?'none':'flex'; document.getElementById('userMenu').style.display=a?'flex':'none'; }
+function requireAuth(action) { if (!token){openModal('loginModal');return;} if(action==='add')openModal('addCarModal'); else if(action==='myads')showPage('myads'); else if(action==='profile')showPage('profile'); }
+
+// ── PROFILE ──
+async function loadProfile() {
+  if (!token) return;
+  try {
+    const r=await fetch(`${API}/api/users/me`,{headers:hdrs()});
+    if (!r.ok) return;
+    const d=await r.json();
+    currentUserId = d.id;
+    const i=(d.name||'U')[0].toUpperCase();
+    document.getElementById('userAvatarBtn').textContent=i;
+    document.getElementById('profileAvatar').textContent=i;
+    document.getElementById('profileName').value=d.name||'';
+    document.getElementById('profileEmail').value=d.email||'';
+    document.getElementById('profilePhone').value=d.phone||'';
+  } catch {}
+}
+
+async function updateProfile() {
+  const name=document.getElementById('profileName').value.trim(), phone=document.getElementById('profilePhone').value.trim();
+  try {
+    const r=await fetch(`${API}/api/users/me`,{method:'PUT',headers:hdrs(),body:JSON.stringify({name,phone})});
+    if (!r.ok) return toast('Xəta','error');
+    toast('Profil yeniləndi','success'); loadProfile();
+  } catch { toast('Server xətası','error'); }
+}
+
+function switchProfileTab(tab) {
+  document.getElementById('tabInfo').style.display=tab==='info'?'block':'none';
+  document.getElementById('tabAds').style.display=tab==='ads'?'block':'none';
+  document.getElementById('tabInfoBtn').classList.toggle('active',tab==='info');
+  document.getElementById('tabAdsBtn').classList.toggle('active',tab==='ads');
+  if (tab==='ads') loadProfileCars();
+}
+
+async function loadProfileCars() {
+  const grid=document.getElementById('profileCarGrid');
+  grid.innerHTML='<div class="spinner"><div class="spin"></div></div>';
+  try {
+    const r=await fetch(`${API}/api/cars/my`,{headers:hdrs()});
+    if (!r.ok) throw new Error();
+    const cars=await r.json();
+    await attachImages(cars);
+    renderCars(cars,'profileCarGrid',true);
+  } catch { grid.innerHTML='<div class="empty-state"><h3>Yüklənə bilmədi</h3></div>'; }
+}
+
+// ── IMAGE LOADING ──
+// Server [{id, url}] qaytarır
+async function fetchCarImages(carId) {
+  try {
+    const r = await fetch(`${API}/api/cars/${carId}/images`, { headers: hdrs(false) });
+    if (!r.ok) return [];
+    const data = await r.json(); // [{id: 1, url: "/api/images/xxx.jpg"}, ...]
+    return data.map(item => ({ id: item.id, url: toAbsUrl(item.url) })).filter(item => item.url);
+  } catch { return []; }
+}
+
+async function attachImages(cars) {
+  await Promise.all(cars.map(async car => {
+    car._images = await fetchCarImages(car.id);
+    car._thumb  = car._images.length > 0 ? car._images[0].url : null;
+  }));
+}
+
+// ── CARS ──
+async function loadCars() {
+  const grid = document.getElementById('carGrid');
+  grid.innerHTML = '<div class="spinner"><div class="spin"></div></div>';
+  try {
+    const r = await fetch(`${API}/api/cars`, { headers: hdrs(false) });
+    if (!r.ok) throw new Error();
+    allCars = await r.json();
+    await attachImages(allCars);
+    filteredCars = [...allCars];
+    renderCars(filteredCars, 'carGrid');
+  } catch {
+    grid.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <h3>Server ilə əlaqə yoxdur</h3>
+      <p style="font-size:.78rem;margin-top:4px">Backend localhost:8080-də işləməlidir</p>
+    </div>`;
+  }
+}
+
+async function loadMyCars() {
+  if (!token) return;
+  const grid = document.getElementById('myCarGrid');
+  grid.innerHTML = '<div class="spinner"><div class="spin"></div></div>';
+  try {
+    const r = await fetch(`${API}/api/cars/my`, { headers: hdrs() });
+    const cars = await r.json();
+    await attachImages(cars);
+    renderCars(cars, 'myCarGrid', true);
+  } catch { grid.innerHTML = '<p style="color:#999;padding:20px;font-size:.85rem">Yüklənə bilmədi</p>'; }
+}
+
+function renderCars(cars, gridId, myAds=false) {
+  const grid = document.getElementById(gridId);
+  if (gridId==='carGrid') document.getElementById('carCount').textContent = cars.length;
+  if (!cars.length) {
+    grid.innerHTML=`<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      <h3>${myAds?'Hələ elanınız yoxdur':'Nəticə tapılmadı'}</h3>
+      ${myAds?'<button class="btn btn-primary" onclick="openModal(\'addCarModal\')" style="margin-top:9px">Elan ver</button>':''}
+    </div>`;
+    return;
+  }
+  grid.innerHTML = cars.map(c => carCardHTML(c, myAds)).join('');
+}
+
+function carCardHTML(car, myAds=false) {
+  const thumb = car._thumb;
+  const imgEl = thumb
+    ? `<img src="${thumb}" alt="${car.brand} ${car.model}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+    : '';
+  const noImg = `<div class="no-img" style="${thumb?'display:none':''}">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v4h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    <span>Şəkil yoxdur</span></div>`;
+  const n = car._images ? car._images.length : 0;
+  const cntBadge = n>1 ? `<span class="img-count-badge">📷 ${n}</span>` : '';
+  const badge = car.status==='SOLD' ? '<span class="car-badge sold">Satıldı</span>' : '<span class="car-badge">Aktiv</span>';
+  const price = Number(car.price).toLocaleString('az-AZ')+' $';
+  const date  = car.createdAt ? new Date(car.createdAt).toLocaleDateString('az-AZ') : '';
+  const actions = myAds ? `<div class="my-card-actions">
+    <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();editCarById(${car.id})">✏️ Düzəlt</button>
+    <button class="btn btn-red   btn-sm" onclick="event.stopPropagation();deleteCar(${car.id})">🗑 Sil</button>
+  </div>` : '';
+  return `<div class="car-card" onclick="openCarDetail(${car.id})">
+    <div class="car-img">${badge}${imgEl}${noImg}${cntBadge}</div>
+    <div class="car-info">
+      <div class="car-title">${car.brand} ${car.model}</div>
+      <div class="car-specs">
+        <span class="spec-tag">${car.year}</span>
+        ${car.mileage?`<span class="spec-tag">${Number(car.mileage).toLocaleString()} km</span>`:''}
+        ${car.color  ?`<span class="spec-tag">${car.color}</span>`:''}
+      </div>
+      <div class="car-price">${price}</div>
+    </div>
+    <div class="car-footer"><span class="car-owner">${car.ownerName||'İstifadəçi'}</span><span class="car-date">${date}</span></div>
+    ${actions}
+  </div>`;
+}
+
+// ── DETAIL ──
+async function openCarDetail(carId) {
+  const car = allCars.find(c=>c.id===carId) || filteredCars.find(c=>c.id===carId);
+  if (!car) return;
+
+  currentCarOwnerId = car.userId || null;
+
+  document.getElementById('detailTitle').textContent = `${car.brand} ${car.model} ${car.year}`;
+  document.getElementById('detailPrice').textContent = Number(car.price).toLocaleString('az-AZ')+' $';
+  document.getElementById('detailDesc').textContent  = car.description||'';
+  document.getElementById('detailSpecs').innerHTML = `
+    <div class="detail-spec"><div class="lbl">Marka</div><div class="val">${car.brand}</div></div>
+    <div class="detail-spec"><div class="lbl">Model</div><div class="val">${car.model}</div></div>
+    <div class="detail-spec"><div class="lbl">İl</div><div class="val">${car.year}</div></div>
+    ${car.mileage?`<div class="detail-spec"><div class="lbl">Yürüş</div><div class="val">${Number(car.mileage).toLocaleString()} km</div></div>`:''}
+    ${car.color  ?`<div class="detail-spec"><div class="lbl">Rəng</div><div class="val">${car.color}</div></div>`:''}
+    <div class="detail-spec"><div class="lbl">Status</div><div class="val">${car.status==='SOLD'?'Satıldı':'Satışda'}</div></div>`;
+  const oi = (car.ownerName||'U')[0].toUpperCase();
+  document.getElementById('detailOwner').innerHTML=`
+    <div class="owner-avatar">${oi}</div>
+    <div><div class="owner-name">${car.ownerName||'İstifadəçi'}</div>${car.ownerPhone?`<div class="owner-phone">📞 ${car.ownerPhone}</div>`:''}</div>`;
+
+  // Şəkilləri yenidən yüklə
+  galleryImgs = await fetchCarImages(carId);
+  if (car._images) car._images = galleryImgs;
+  if (galleryImgs.length > 0) car._thumb = galleryImgs[0].url;
+
+  galleryIdx = 0;
+  updateGallery();
+  openModal('carDetailModal');
+}
+
+function updateGallery() {
+  const imgEl    = document.getElementById('detailMainImg');
+  const navEl    = document.getElementById('detailNav');
+  const dotsEl   = document.getElementById('galleryDots');
+  const cntEl    = document.getElementById('galleryCounter');
+  const gallery  = document.getElementById('detailGallery');
+  const delBtn   = document.getElementById('deleteImgBtn');
+
+  if (!galleryImgs.length) {
+    imgEl.style.display='none'; navEl.style.display='none'; cntEl.style.display='none';
+    dotsEl.innerHTML=''; gallery.style.background='#edf0f3';
+    delBtn.style.display='none';
+    return;
+  }
+
+  gallery.style.background='#111';
+  imgEl.style.display='block';
+  imgEl.src = galleryImgs[galleryIdx].url;
+
+  const multi = galleryImgs.length > 1;
+  navEl.style.display = multi ? 'flex' : 'none';
+  cntEl.style.display = multi ? 'block' : 'none';
+  if (multi) cntEl.textContent = `${galleryIdx+1} / ${galleryImgs.length}`;
+
+  dotsEl.innerHTML = galleryImgs.map((_,i)=>
+    `<div class="gallery-dot ${i===galleryIdx?'active':''}" onclick="event.stopPropagation();galleryIdx=${i};updateGallery()"></div>`
+  ).join('');
+
+  // Silmə düyməsi — yalnız token varsa göstər (backend ownership yoxlayır)
+  delBtn.style.display = token ? 'block' : 'none';
+}
+
+function galleryNav(dir) {
+  if (!galleryImgs.length) return;
+  galleryIdx = (galleryIdx+dir+galleryImgs.length) % galleryImgs.length;
+  updateGallery();
+}
+
+// ── ŞƏKİL SİL ──
+async function deleteCurrentImage() {
+  if (!galleryImgs.length || !token) return;
+  const img = galleryImgs[galleryIdx];
+  if (!confirm('Bu şəkili silmək istədiyinizə əminsiniz?')) return;
+  try {
+    const r = await fetch(`${API}/api/images/${img.id}`, { method: 'DELETE', headers: hdrs() });
+    if (r.ok) {
+      galleryImgs.splice(galleryIdx, 1);
+      if (galleryIdx >= galleryImgs.length) galleryIdx = Math.max(0, galleryImgs.length - 1);
+      updateGallery();
+      toast('Şəkil silindi', 'success');
+      loadCars();
+    } else {
+      const d = await r.json().catch(()=>({}));
+      toast(d.error || 'Silinmə xətası', 'error');
+    }
+  } catch { toast('Server xətası', 'error'); }
+}
+
+// ── ADD/EDIT/DELETE CAR ──
+function editCar(car) {
+  document.getElementById('addCarTitle').textContent='Elanı Düzəlt';
+  document.getElementById('editCarId').value=car.id;
+  document.getElementById('carBrand').value=car.brand||'';
+  document.getElementById('carModel').value=car.model||'';
+  document.getElementById('carYear').value=car.year||'';
+  document.getElementById('carPrice').value=car.price||'';
+  document.getElementById('carMileage').value=car.mileage||'';
+  document.getElementById('carColor').value=car.color||'';
+  document.getElementById('carDesc').value=car.description||'';
+  selFiles=[]; document.getElementById('imgPreviews').innerHTML=''; updateUploadUI();
+  openModal('addCarModal');
+}
+
+function editCarById(id) {
+  const car = allCars.find(c=>c.id==id) || filteredCars.find(c=>c.id==id);
+  if (!car) return toast('Elan tapılmadı','error');
+  editCar(car);
+}
+
+
+async function saveCar() {
+  const id=document.getElementById('editCarId').value;
+  const brand=document.getElementById('carBrand').value.trim();
+  const model=document.getElementById('carModel').value.trim();
+  const year=parseInt(document.getElementById('carYear').value);
+  const price=parseFloat(document.getElementById('carPrice').value);
+  const mileage=parseInt(document.getElementById('carMileage').value)||null;
+  const color=document.getElementById('carColor').value.trim()||null;
+  const desc=document.getElementById('carDesc').value.trim()||null;
+  if (!brand||!model||!year||!price) return showErr('addCarError','Marka, model, il və qiymət mütləqdir');
+  try {
+    const r=await fetch(id?`${API}/api/cars/${id}`:`${API}/api/cars`,{
+      method:id?'PUT':'POST', headers:hdrs(),
+      body:JSON.stringify({brand,model,year,price,mileage,color,description:desc})
+    });
+    if (!r.ok) return showErr('addCarError','Xəta baş verdi');
+    const saved=await r.json();
+    for (const f of selFiles.slice(0,MAX_IMG)) {
+      const fd=new FormData(); fd.append('file',f);
+      await fetch(`${API}/api/cars/${saved.id}/images`,{method:'POST',headers:{'Authorization':'Bearer '+token},body:fd});
+    }
+    closeModal('addCarModal'); resetAddForm();  
+    toast(id?'Elan yeniləndi!':'Elan yayımlandı!','success');
+    loadCars(); if(id){loadMyCars();loadProfileCars();}
+  } catch { showErr('addCarError','Server xətası'); }
+}
+
+async function deleteCar(id) {
+  if (!id) return toast('ID tapılmadı','error');
+  if (!confirm('Bu elanı silmək istədiyinizə əminsiniz?')) return;
+  try {
+    const r=await fetch(`${API}/api/cars/${id}`,{method:'DELETE',headers:hdrs()});
+    if (r.status===204||r.ok){toast('Elan silindi','success');loadCars();loadMyCars();loadProfileCars();}
+    else { const d=await r.json().catch(()=>({})); toast(d.message||d.error||'Silinmə xətası '+r.status,'error'); }
+  } catch(e) { toast('Server xətası: '+e.message,'error'); }
+}
+
+function resetAddForm() {
+  document.getElementById('addCarTitle').textContent='Yeni Elan';
+  document.getElementById('editCarId').value='';
+  ['carBrand','carModel','carYear','carPrice','carMileage','carColor','carDesc'].forEach(i=>document.getElementById(i).value='');
+  selFiles=[]; document.getElementById('imgPreviews').innerHTML=''; document.getElementById('imgFileInput').value=''; updateUploadUI(); hideErr('addCarError');
+}
+
+function handleFileSelect(inp) {
+  const files=Array.from(inp.files), can=MAX_IMG-selFiles.length;
+  if (can<=0){toast(`Artıq ${MAX_IMG} şəkil seçilmişdir`,'error');inp.value='';return;}
+  const add=files.slice(0,can);
+  if (files.length>can) toast(`${files.length-can} şəkil limitə görə əlavə edilmədi`,'error');
+  selFiles.push(...add); renderPreviews(); updateUploadUI(); inp.value='';
+}
+
+function removeFile(i) { selFiles.splice(i,1); renderPreviews(); updateUploadUI(); }
+
+function renderPreviews() {
+  const c=document.getElementById('imgPreviews'); c.innerHTML='';
+  selFiles.forEach((f,i)=>{
+    const w=document.createElement('div'); w.className='img-preview-wrap';
+    const img=document.createElement('img'); img.className='img-preview'; img.src=URL.createObjectURL(f);
+    const d=document.createElement('button'); d.className='img-del'; d.textContent='×';
+    d.onclick=e=>{e.stopPropagation();removeFile(i);};
+    w.appendChild(img); w.appendChild(d); c.appendChild(w);
+  });
+}
+
+function updateUploadUI() {
+  const a=document.getElementById('uploadArea'), l=document.getElementById('uploadLabel'), n=selFiles.length;
+  if (n>=MAX_IMG){a.style.opacity='0.45';a.style.pointerEvents='none';l.textContent=`Maksimum ${MAX_IMG} şəkil seçildi`;}
+  else{a.style.opacity='1';a.style.pointerEvents='auto';l.textContent=n===0?`Şəkil seçin (maks. ${MAX_IMG} ədəd)`:`Daha əlavə et (${n}/${MAX_IMG})`;}
+}
+
+// ── FILTER ──
+function applyFilter() {
+  const b=document.getElementById('filterBrand').value.trim().toLowerCase();
+  const y0=parseInt(document.getElementById('filterYearMin').value)||0;
+  const y1=parseInt(document.getElementById('filterYearMax').value)||9999;
+  const pm=parseFloat(document.getElementById('filterPriceMax').value)||Infinity;
+  filteredCars=allCars.filter(c=>(!b||c.brand.toLowerCase().includes(b)||c.model.toLowerCase().includes(b))&&c.year>=y0&&c.year<=y1&&Number(c.price)<=pm);
+  sortCars();
+}
+function doSearch(){document.getElementById('filterBrand').value=document.getElementById('headerSearch').value.trim();applyFilter();}
+function clearFilter(){['filterBrand','filterYearMin','filterYearMax','filterPriceMax'].forEach(i=>document.getElementById(i).value='');document.getElementById('headerSearch').value='';filteredCars=[...allCars];renderCars(filteredCars,'carGrid');}
+function sortCars(){const s=document.getElementById('sortSelect').value,cars=[...filteredCars];if(s==='cheapest')cars.sort((a,b)=>Number(a.price)-Number(b.price));else if(s==='expensive')cars.sort((a,b)=>Number(b.price)-Number(a.price));else cars.sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));renderCars(cars,'carGrid');}
+
+// ── PAGE NAV ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.mob-nav-btn').forEach(b=>b.classList.remove('active'));
+  if (name==='home'){document.getElementById('homePage').classList.add('active');document.getElementById('mobHome').classList.add('active');loadCars();}
+  else if(name==='myads'){if(!token){openModal('loginModal');return;}document.getElementById('myAdsPage').classList.add('active');document.getElementById('mobMyAds').classList.add('active');loadMyCars();}
+  else if(name==='profile'){if(!token){openModal('loginModal');return;}document.getElementById('profilePage').classList.add('active');document.getElementById('mobProfile').classList.add('active');loadProfile();switchProfileTab('info');}
+}
+
+function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow='';
+  if(id==='loginModal'){document.getElementById('loginEmail').value='';document.getElementById('loginPassword').value='';hideErr('loginError');}
+  if(id==='registerModal'){['regName','regEmail','regPhone','regPassword'].forEach(function(f){document.getElementById(f).value='';});hideErr('regError');}
+}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)closeModal(el.id);}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.querySelectorAll('.modal-overlay.open').forEach(m=>closeModal(m.id));});
+
+function toast(msg,type='info'){const el=document.createElement('div');el.className=`toast ${type}`;el.textContent=msg;document.getElementById('toastContainer').appendChild(el);setTimeout(()=>el.remove(),3000);}
+function showErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.classList.add('show');}
+function hideErr(id){const e=document.getElementById(id);e.textContent='';e.classList.remove('show');}
+
+updateAuthUI(); loadCars(); if(token)loadProfile();
+document.getElementById('headerSearch').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+</script>
+</body>
+</html>
