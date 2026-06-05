@@ -23,7 +23,7 @@ jobs:
         working-directory: ./retroride
         run: |
           chmod +x gradlew
-          ./gradlew bootJar -x test
+          ./gradlew bootJar -x test -Porg.gradle.java.home=$JAVA_HOME
 
       - name: Copy files to Server (SCP)
         uses: appleboy/scp-action@master
