@@ -12,23 +12,22 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 17
+      - name: Set up JDK 26
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '26'  # Layihənə uyğun olaraq Java 26 quraşdırırıq
           distribution: 'temurin'
           cache: gradle
 
       - name: Grant execute permission for gradlew
-        working-directory: ./retroride  # Gradle əmri bu qovluqda icra olunacaq
+        working-directory: ./retroride
         run: chmod +x gradlew
 
       - name: Build JAR with Gradle
-        working-directory: ./retroride  # Gradle əmri bu qovluqda icra olunacaq
+        working-directory: ./retroride
         run: ./gradlew bootJar -x test
 
       - name: Prepare JAR for Dockerfile
-        # Yığılan jar faylını Dockerfile-ın oxuya bilməsi üçün kök qovluğa daşıyırıq
         run: |
           mkdir -p build/libs
           cp retroride/build/libs/*.jar build/libs/
