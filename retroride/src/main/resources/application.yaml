@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    # ${DEYISEN_ADI:standart_deyer} məntiqi ilə işləyir
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
+    username: ${DB_USER:admin}
+    password: ${DB_PASSWORD:123four}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: ${HIBERNATE_DDL:update}
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 50MB
+
+jwt:
+  secret: ${JWT_SECRET:retroride-super-secret-key-must-be-at-least-256-bits!!}
+  expiration: 604800000
+
+upload:
+  dir: ${UPLOAD_DIR:uploads}
