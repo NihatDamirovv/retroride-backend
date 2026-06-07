@@ -22,12 +22,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Artıq bu metodu aşağıda yaradırıq
-                .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll() // Hər kəsə icazə veririk
-                )
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            // CORS ayarlarını aktiv edirik və serverin IP-sinə icazə veririk
+            .cors(cors -> cors.configurationSource(request -> {
+                var config = new org.springframework.web.cors.CorsConfiguration();
+                config.setAllowedOrigins(java.util.List.of("http://13.48.194.173", "http://localhost:8080"));
+                config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(java.util.List.of("*"));
+                config.setAllowCredentials(true);
+                return config;
+            }))
+            .csrf(csrf -> csrf.disable()) // Əgər disable etməmisənsə mütləq et
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/api/auth/**", "/api/cars/**", "/api/cars").permitAll() // Hər kəsə açıq olanlar
+                .anyRequest().authenticated()
+            );
 
         return http.build();
     }
