@@ -44,5 +44,13 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             cd /home/ubuntu/retroride
-            docker compose down
+            
+            # Konteynerləri dayandır və tamamilə sil
+            # --volumes əlavə etdik ki, şəbəkə və ad konflikti tam aradan qalxsın
+            docker compose down -v || true
+            
+            # Ehtiyat tədbiri olaraq adı ilə məcburi sil
+            docker rm -f postgres-db spring-app nginx-server || true
+            
+            # Yenidən başlat
             docker compose up --build -d
