@@ -37,6 +37,8 @@ services:
       - "80:80"
     volumes:
       - ./retroride/index.html:/usr/share/nginx/html/index.html:ro
+      # Bax mühüm olan sətir budur: Nginx indi sənin yaradacağın proksi ayarlarını oxuyacaq
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
 
 volumes:
   postgres_data:
