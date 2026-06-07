@@ -30,7 +30,19 @@ public class SecurityConfig {
                 config.setAllowedHeaders(java.util.List.of("*"));
                 config.setAllowCredentials(true);
                 return config;
+            }));
+
+        http
+            .cors(cors -> cors.configurationSource(request -> {
+                var config = new org.springframework.web.cors.CorsConfiguration();
+                config.setAllowedOrigins(java.util.List.of("http://13.48.194.173", "http://localhost:8080"));
+                config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(java.util.List.of("*"));
+                config.setAllowCredentials(true);
+                return config;
             }))
+            .csrf(csrf -> csrf.disable())
+
             .csrf(csrf -> csrf.disable()) // Əgər disable etməmisənsə mütləq et
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**", "/api/cars/**", "/api/cars").permitAll() // Hər kəsə açıq olanlar
